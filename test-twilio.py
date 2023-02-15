@@ -11,10 +11,12 @@ client = Client(hydrachain_arguments.get_twilio_account_sid(), hydrachain_argume
 
 format_1 = "Hydra Mined:\n5.88123415.\n10-February-2023 21:22\nH8Rw6bdg8zYgQ8YYm5K7zkK6EytetYsAuY"
 
-message = client.messages.create(
-  body=format_1,
-  from_=hydrachain_arguments.get_twilio_from_number(),
-  to=hydrachain_arguments.get_sms_to_number()
-)
+def sendMessage():
+  message = client.messages.create(
+    body=format_1,
+    from_=hydrachain_arguments.get_twilio_from_number(),
+    to=hydrachain_arguments.get_sms_to_number()
+  )
+  print(message.sid)
 
-print(message.sid)
+#sendMessage()
