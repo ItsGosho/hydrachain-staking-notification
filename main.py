@@ -49,7 +49,7 @@ def transaction_checker(*listeners):
         mined_transactions_after = explorer_reader.request_mined_transactions_after(hydrachain_arguments.get_address(),
                                                                                     last_fetch)
         total_mined_transactions_after = len(mined_transactions_after)
-        logging.info("Checked for mined transactions until datetime %s. Found: %s", last_fetch,
+        logging.info("Checked for mined transactions until %s. Found: %s", last_fetch,
                      total_mined_transactions_after)
         last_fetch = datetime.datetime.now()
 
