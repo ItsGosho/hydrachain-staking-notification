@@ -8,7 +8,7 @@ from twilio.rest import Client
 from arguments import HydraChainArguments
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
-CHECK_INTERVAL_SECONDS = 60 * 60 #Each 1 hour
+CHECK_INTERVAL_SECONDS = 60 * 60  # Each 1 hour
 
 hydrachain_arguments = HydraChainArguments()
 logging.basicConfig(level=hydrachain_arguments.get_log_level(), format=LOG_FORMAT)
@@ -54,8 +54,9 @@ def transaction_checker(*listeners):
                      total_mined_transactions_after)
         last_fetch = datetime.datetime.now()
 
-        for listener in listeners:
-            listener(mined_transactions_after)
+        if total_mined_transactions_after > 0:
+            for listener in listeners:
+                listener(mined_transactions_after)
 
 
 if __name__ == '__main__':

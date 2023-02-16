@@ -1,0 +1,14 @@
+apt install python3
+apt install python3-pip
+pip install twilio
+
+- Create /opt/sources/hydrachain-staking-notification
+- Clone Hydrachain-Staking-Notification from GitHub into /opt/sources/hydrachain-staking-notification
+
+- Create /opt/services
+- Create /opt/services/logs
+- Create /opt/services/StartScripts
+- Create the hydrachain-staking-notification.service in /opt/services
+- Create the HydrachainStakingNotificationStart.sh in /opt/services/StartScripts
+
+systemctl enable /opt/services/hydrachain-staking-notification.service
