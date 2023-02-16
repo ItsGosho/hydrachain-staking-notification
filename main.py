@@ -8,7 +8,6 @@ from twilio.rest import Client
 from arguments import HydraChainArguments
 
 LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
-CHECK_INTERVAL_SECONDS = 60 * 60  # Each 1 hour
 
 hydrachain_arguments = HydraChainArguments()
 logging.basicConfig(level=hydrachain_arguments.get_log_level(), format=LOG_FORMAT)
@@ -46,7 +45,7 @@ def transaction_checker(*listeners):
     last_fetch = datetime.datetime.now()
 
     while True:
-        time.sleep(CHECK_INTERVAL_SECONDS)
+        time.sleep(hydrachain_arguments.get_transactions_check_interval())
         mined_transactions_after = explorer_reader.request_mined_transactions_after(hydrachain_arguments.get_address(),
                                                                                     last_fetch)
         total_mined_transactions_after = len(mined_transactions_after)
@@ -61,7 +60,7 @@ def transaction_checker(*listeners):
 
 if __name__ == '__main__':
     logging.info("Hydrachain Staking Notification.")
-    logging.info("Check Interval: %ss", CHECK_INTERVAL_SECONDS)
+    logging.info("Check Interval: %ss", hydrachain_arguments.get_transactions_check_interval())
 
     p1 = multiprocessing.Process(target=transaction_checker, args=(event_listener_test,))
     p1.start()
