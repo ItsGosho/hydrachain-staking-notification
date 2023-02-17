@@ -7,10 +7,8 @@ from twilio.rest import Client
 
 from arguments import HydraChainArguments
 
-LOG_FORMAT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
-
 hydrachain_arguments = HydraChainArguments()
-logging.basicConfig(level=hydrachain_arguments.get_log_level(), format=LOG_FORMAT)
+logging.basicConfig(level=hydrachain_arguments.get_log_level(), format=hydrachain_arguments.get_log_format())
 client = Client(hydrachain_arguments.get_twilio_account_sid(), hydrachain_arguments.get_twilio_auth_token())
 
 def send_sms(amount, datetime, address):

@@ -1,11 +1,13 @@
 import argparse
 
 LOG_LEVEL_DEFAULT = 'INFO'
+LOG_FORMAT_DEFAULT = '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
 TRANSACTION_CHECK_INTERVAL_DEFAULT = 60 * 60  # 1 Hour
 SMS_TRANSACTION_DATE_FORMAT_DEFAULT = '%d-%b-%Y %H:%M:%S'
 
 ADDRESS_NAME = 'address'
 LOG_LEVEL_NAME = 'log-level'
+LOG_FORMAT_NAME = 'log-format'
 TWILIO_ACCOUNT_SID_NAME = 'twilio-account-sid'
 TWILIO_AUTH_TOKEN_NAME = 'twilio-auth-token'
 TWILIO_FROM_NUMBER_NAME = 'twilio-from-number'
@@ -42,7 +44,7 @@ class HydraChainArguments:
         parser.add_argument('--{}'.format(LOG_LEVEL_NAME),
                             dest=LOG_LEVEL_NAME,
                             type=str,
-                            help='Level of logging. Default is {}'.format(LOG_LEVEL_DEFAULT),
+                            help='Level of logging. Default: {}'.format(LOG_LEVEL_DEFAULT),
                             default=LOG_LEVEL_DEFAULT,
                             action=LogLevelAction)
 
@@ -69,14 +71,20 @@ class HydraChainArguments:
         parser.add_argument('--{}'.format(TRANSACTIONS_CHECK_INTERVAL_NAME),
                             dest=TRANSACTIONS_CHECK_INTERVAL_NAME,
                             type=int,
-                            help="How often to check for transactions. Default is {} seconds".format(TRANSACTION_CHECK_INTERVAL_DEFAULT),
+                            help="How often to check for transactions. Default: {} seconds".format(TRANSACTION_CHECK_INTERVAL_DEFAULT),
                             default=TRANSACTION_CHECK_INTERVAL_DEFAULT)
 
         parser.add_argument('--{}'.format(SMS_TRANSACTION_DATE_FORMAT_NAME),
                             dest=SMS_TRANSACTION_DATE_FORMAT_NAME,
                             type=str,
-                            help="Datetime format for the transaction date sms. Refer to https://strftime.org/ for available formatting. Default is %%d-%%b-%%Y %%H:%%M:%%S",
+                            help="Datetime format for the transaction date sms. Refer to https://strftime.org/ for available formatting. Default: {}".format(SMS_TRANSACTION_DATE_FORMAT_DEFAULT.replace('%', '%%')),
                             default=SMS_TRANSACTION_DATE_FORMAT_DEFAULT)
+
+        parser.add_argument('--{}'.format(LOG_FORMAT_NAME),
+                            dest=LOG_FORMAT_NAME,
+                            type=str,
+                            help="Format of the logs. Refer to https://docs.python.org/3/library/logging.html#logrecord-attributes for available formatting. Default: {}".format(LOG_FORMAT_DEFAULT.replace('%', '%%')),
+                            default=LOG_FORMAT_DEFAULT)
 
         self.parser = parser
         self.arguments = self.parser.parse_args()
@@ -86,6 +94,9 @@ class HydraChainArguments:
 
     def get_log_level(self):
         return self.get_argument(LOG_LEVEL_NAME)
+
+    def get_log_format(self):
+        return self.get_argument(LOG_FORMAT_NAME)
 
     def get_twilio_account_sid(self):
         return self.get_argument(TWILIO_ACCOUNT_SID_NAME)
