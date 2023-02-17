@@ -13,9 +13,9 @@ hydrachain_arguments = HydraChainArguments()
 logging.basicConfig(level=hydrachain_arguments.get_log_level(), format=LOG_FORMAT)
 client = Client(hydrachain_arguments.get_twilio_account_sid(), hydrachain_arguments.get_twilio_auth_token())
 
-
 def send_sms(amount, datetime, address):
-    messageBody = "Hydra Mined:\n{}\n{}\n{}".format(amount, datetime, address)
+    datetime_formatted = datetime.strftime(hydrachain_arguments.get_sms_transaction_date_format())
+    messageBody = "Hydra Mined:\n{}\n{} UTC\n{}".format(amount, datetime_formatted, address)
     sentFrom = hydrachain_arguments.get_twilio_from_number()
     sentTo = hydrachain_arguments.get_sms_to_number()
 

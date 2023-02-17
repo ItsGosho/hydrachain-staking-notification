@@ -2,6 +2,7 @@ import argparse
 
 LOG_LEVEL_DEFAULT = 'INFO'
 TRANSACTION_CHECK_INTERVAL_DEFAULT = 60 * 60  # 1 Hour
+SMS_TRANSACTION_DATE_FORMAT_DEFAULT = '%d-%b-%Y %H:%M:%S'
 
 ADDRESS_NAME = 'address'
 LOG_LEVEL_NAME = 'log-level'
@@ -10,6 +11,7 @@ TWILIO_AUTH_TOKEN_NAME = 'twilio-auth-token'
 TWILIO_FROM_NUMBER_NAME = 'twilio-from-number'
 SMS_TO_NUMBER_NAME = 'sms-to-number'
 TRANSACTIONS_CHECK_INTERVAL_NAME = 'transactions-check-interval'
+SMS_TRANSACTION_DATE_FORMAT_NAME = 'sms-transaction-date-format'
 
 LOG_LEVEL_ALLOWED = ['NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
@@ -67,8 +69,14 @@ class HydraChainArguments:
         parser.add_argument('--{}'.format(TRANSACTIONS_CHECK_INTERVAL_NAME),
                             dest=TRANSACTIONS_CHECK_INTERVAL_NAME,
                             type=int,
-                            help="How often to check for transactions.",
+                            help="How often to check for transactions. Default is {} seconds".format(TRANSACTION_CHECK_INTERVAL_DEFAULT),
                             default=TRANSACTION_CHECK_INTERVAL_DEFAULT)
+
+        parser.add_argument('--{}'.format(SMS_TRANSACTION_DATE_FORMAT_NAME),
+                            dest=SMS_TRANSACTION_DATE_FORMAT_NAME,
+                            type=str,
+                            help="Datetime format for the transaction date sms. Default is %%d-%%b-%%Y %%H:%%M:%%S",
+                            default=SMS_TRANSACTION_DATE_FORMAT_DEFAULT)
 
         self.parser = parser
         self.arguments = self.parser.parse_args()
@@ -93,6 +101,9 @@ class HydraChainArguments:
 
     def get_transactions_check_interval(self):
         return self.get_argument(TRANSACTIONS_CHECK_INTERVAL_NAME)
+
+    def get_sms_transaction_date_format(self):
+        return self.get_argument(SMS_TRANSACTION_DATE_FORMAT_NAME)
 
     def get_argument(self, argument_name):
         return self.arguments.__getattribute__(argument_name)
