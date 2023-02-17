@@ -41,9 +41,7 @@ def request_mined_transactions_after(address, datetime):
 
 
 # address = "XXX"
-# date_str = '9/02/2023'
-# date = datetime.datetime.strptime(date_str, '%d/%m/%Y')
-# mined_transactions_until = request_mined_transactions_until(address, date)
+# mined_transactions_until = request_mined_transactions_after(address, datetime.datetime.now() - datetime.timedelta(days =10))
 # print(json.dumps(mined_transactions_until, indent = 4))
 
 # def requestAllAddressTransactions(address):
