@@ -75,7 +75,7 @@ class HydraChainArguments:
         parser.add_argument('--{}'.format(SMS_TRANSACTION_DATE_FORMAT_NAME),
                             dest=SMS_TRANSACTION_DATE_FORMAT_NAME,
                             type=str,
-                            help="Datetime format for the transaction date sms. Default is %%d-%%b-%%Y %%H:%%M:%%S",
+                            help="Datetime format for the transaction date sms. Refer to https://strftime.org/ for available formatting. Default is %%d-%%b-%%Y %%H:%%M:%%S",
                             default=SMS_TRANSACTION_DATE_FORMAT_DEFAULT)
 
         self.parser = parser
