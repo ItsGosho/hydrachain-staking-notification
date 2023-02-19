@@ -22,7 +22,7 @@ def send_sms(amount, datetime, address):
         from_=sentFrom,
         to=sentTo
     )
-    logging.info("Sent SMS (%s) with from %s to %s with content %s", message.sid, sentFrom, sentTo, messageBody)
+    logging.info("Sent SMS (%s) from %s to %s with content %s", message.sid, sentFrom, sentTo, messageBody)
 
 
 def event_listener_test(transactions):
@@ -47,7 +47,7 @@ def transaction_checker(*listeners):
         mined_transactions_after = explorer_reader.request_mined_transactions_after(hydrachain_arguments.get_address(),
                                                                                     last_fetch)
         total_mined_transactions_after = len(mined_transactions_after)
-        logging.info("Checked for mined transactions until %s. Found: %s", last_fetch,
+        logging.info("Checked for mined transactions after %s. Found: %s", last_fetch,
                      total_mined_transactions_after)
         last_fetch = datetime.datetime.now()
 
