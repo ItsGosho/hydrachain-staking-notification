@@ -68,9 +68,9 @@ secret = 'asd123'
 tolerance_seconds = 60  # 300
 
 # Send
-url = 'https://webhook.site/7a1b0dad-b8ff-4da4-a642-806f2503adfa'
+url = 'http://localhost:5555'#'https://webhook.site/7a1b0dad-b8ff-4da4-a642-806f2503adfa'
 body = {'name': 'joro'}
-# send_webhook(secret, url, json.dumps(body))
+send_webhook(secret, url, json.dumps(body))
 
 # Check
 received_signature = '2d65924bf6fea448866cc3cf391788ce1e77fb4caa491a7721457e82cd368ee1,1676727682.667726'

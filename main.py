@@ -58,7 +58,7 @@ def transaction_checker(*listeners):
 
 if __name__ == '__main__':
     logging.info("Hydrachain Staking Notification.")
-    logging.info("Check Interval: %ss", hydrachain_arguments.get_transactions_check_interval())
+    logging.info("Check Interval: %s seconds.", hydrachain_arguments.get_transactions_check_interval())
 
     p1 = multiprocessing.Process(target=transaction_checker, args=(event_listener_test,))
     p1.start()
