@@ -1,6 +1,5 @@
 import argparse
 
-# Define constants for the argument names
 ADDRESS_ARG = 'address'
 LOG_LEVEL_ARG = 'log-level'
 TWILIO_ACCOUNT_SID_ARG = 'twilio-account-sid'
@@ -15,7 +14,6 @@ WEBHOOK_ENABLE_ARG = 'webhook-enable'
 WEBHOOK_URL_ARG = 'webhook-url'
 WEBHOOK_SECRET_KEY_ARG = 'webhook-secret-key'
 
-# Define the arguments
 arguments = {
     ADDRESS_ARG: {
         'type': str,
