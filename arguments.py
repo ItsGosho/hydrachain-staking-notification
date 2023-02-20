@@ -182,25 +182,23 @@ class HydraChainArguments:
 
         required_argument_names = [WEBHOOK_SECRET_KEY_NAME]
 
-        missing_required_argument_names = self.get_argument_names_with_none_value(required_argument_names)
-
-        if len(missing_required_argument_names) > 0:
-            error_message = 'Argument {} requires the following argument/s to be provided: {}'.format(
-                WEBHOOK_ENABLE_NAME, ', '.join(missing_required_argument_names))
-            self.parser.error(error_message)
-
+        self._validate_arguments_present(WEBHOOK_ENABLE_NAME, required_argument_names)
     def _validate_sms_arguments_are_provided(self):
 
         if not self.get_sms_enable():
             return
 
-        required_argument_names = [TWILIO_ACCOUNT_SID_NAME, TWILIO_AUTH_TOKEN_NAME, TWILIO_FROM_NUMBER_NAME, SMS_TO_NUMBER_NAME]
+        required_argument_names = [TWILIO_ACCOUNT_SID_NAME, TWILIO_AUTH_TOKEN_NAME, TWILIO_FROM_NUMBER_NAME,
+                                   SMS_TO_NUMBER_NAME]
+        self._validate_arguments_present(SMS_ENABLE_NAME, required_argument_names)
 
+    def _validate_arguments_present(self, argument_name, required_argument_names):
         missing_required_argument_names = self.get_argument_names_with_none_value(required_argument_names)
+        missing_required_arguments = self.prefix_strings('--', missing_required_argument_names)
 
-        if len(missing_required_argument_names) > 0:
-            error_message = 'Argument {} requires the following argument/s to be provided: {}'.format(
-                SMS_ENABLE_NAME, ', '.join(missing_required_argument_names))
+        if len(missing_required_arguments) > 0:
+            error_message = 'Argument --{} requires additional arguments: {}'.format(
+                argument_name, ', '.join(missing_required_arguments))
             self.parser.error(error_message)
 
     def get_arguments(self):
@@ -217,3 +215,6 @@ class HydraChainArguments:
             argument_names_with_none_value.append(argument_name) if argument_value == None else None
 
         return argument_names_with_none_value
+
+    def prefix_strings(self, prefix, strings):
+        return [prefix + s for s in strings]
