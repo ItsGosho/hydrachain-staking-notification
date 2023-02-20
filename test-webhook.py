@@ -16,7 +16,7 @@ def send_webhook(secret_key, url, body):
     hashable = body + str(timestamp)
     hashed = hmac.new(secret_key.encode(), hashable.encode(), hashlib.sha256).hexdigest()
 
-    signature_header = "{},{}".format(hashed, timestamp)
+    signature_header = f"{hashed},{timestamp}"
     headers = {'X-Webhook-Signature': signature_header}
     response = requests.post(url, data=body, headers=headers)
     print(response)

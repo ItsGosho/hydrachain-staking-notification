@@ -92,62 +92,19 @@ class ArgumentParser:
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
         for arg_name, arg_attrs in arguments.items():
-            parser.add_argument('--{}'.format(arg_name), dest=arg_name, **arg_attrs)
+            parser.add_argument(f'--{arg_name}', dest=arg_name, **arg_attrs)
 
         self.parser = parser
         self.arguments = self.parser.parse_args()
         self._validate_sms_arguments_are_provided()
         self._validate_webhook_arguments_are_provided()
 
-    def get_address(self):
-        return self.get_argument(Argument.ADDRESS)
-
-    def get_log_level(self):
-        return self.get_argument(Argument.LOG_LEVEL)
-
-    def get_log_format(self):
-        return self.get_argument(Argument.LOG_FORMAT)
-
-    def get_twilio_account_sid(self):
-        return self.get_argument(Argument.TWILIO_ACCOUNT_SID)
-
-    def get_twilio_auth_token(self):
-        return self.get_argument(Argument.TWILIO_AUTH_TOKEN)
-
-    def get_twilio_from_number(self):
-        return self.get_argument(Argument.TWILIO_FROM_NUMBER)
-
-    def get_sms_to_number(self):
-        return self.get_argument(Argument.SMS_TO_NUMBER)
-
-    def get_transactions_check_interval(self):
-        return self.get_argument(Argument.TRANSACTIONS_CHECK_INTERVAL)
-
-    def get_sms_transaction_date_format(self):
-        return self.get_argument(Argument.SMS_TRANSACTION_DATE_FORMAT)
-
-    def get_sms_enable(self):
-        smsEnableArgumentValue = self.get_argument(Argument.SMS_ENABLE)
-
-        return True if smsEnableArgumentValue == 'yes' else False
-
-    def get_webhook_enable(self):
-        webhookEnableArgument = self.get_argument(Argument.WEBHOOK_ENABLE)
-
-        return True if webhookEnableArgument == 'yes' else False
-
-    def get_webhook_url(self):
-        return self.get_argument(Argument.WEBHOOK_URL)
-
-    def get_webhook_secret(self):
-        return self.get_argument(Argument.WEBHOOK_SECRET_KEY)
-
     def get_argument(self, argument):
         return self.arguments.__getattribute__(argument.value)
 
     def _validate_webhook_arguments_are_provided(self):
 
-        if not self.get_webhook_enable():
+        if self.get_argument(Argument.WEBHOOK_ENABLE) == 'no':
             return
 
         required_arguments = [Argument.WEBHOOK_SECRET_KEY]
@@ -156,7 +113,7 @@ class ArgumentParser:
 
     def _validate_sms_arguments_are_provided(self):
 
-        if not self.get_sms_enable():
+        if self.get_argument(Argument.SMS_ENABLE) == 'no':
             return
 
         required_arguments = [Argument.TWILIO_ACCOUNT_SID, Argument.TWILIO_AUTH_TOKEN, Argument.TWILIO_FROM_NUMBER,

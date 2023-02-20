@@ -9,34 +9,29 @@ from arguments import ArgumentParser, Argument
 
 argument_parser = ArgumentParser()
 
-# TODO: Which one of these two is better and what are their cons and pros
-argument_parser.get_sms_enable()
-argument_parser.get_argument(Argument.ADDRESS)
-
-logging.basicConfig(level=argument_parser.get_log_level(), format=argument_parser.get_log_format())
-
 logging.basicConfig(level=argument_parser.get_argument(Argument.LOG_LEVEL),
                     format=argument_parser.get_argument(Argument.LOG_FORMAT))
 
-client = Client(argument_parser.get_twilio_account_sid(), argument_parser.get_twilio_auth_token())
+client = Client(argument_parser.get_argument(Argument.TWILIO_ACCOUNT_SID),
+                argument_parser.get_argument(Argument.TWILIO_AUTH_TOKEN))
 
 
 def send_sms(amount, datetime, address):
-    datetime_formatted = datetime.strftime(argument_parser.get_sms_transaction_date_format())
-    messageBody = "Hydra Mined:\n{}\n{} UTC\n{}".format(amount, datetime_formatted, address)
-    sentFrom = argument_parser.get_twilio_from_number()
-    sentTo = argument_parser.get_sms_to_number()
+    datetime_formatted = datetime.strftime(argument_parser.get_argument(Argument.SMS_TRANSACTION_DATE_FORMAT))
+    messageBody = f"Hydra Mined:\n{amount}\n{datetime_formatted} UTC\n{address}"
+    sentFrom = argument_parser.get_argument(Argument.TWILIO_FROM_NUMBER)
+    sentTo = argument_parser.get_argument(Argument.SMS_TO_NUMBER)
 
     message = client.messages.create(
         body=messageBody,
         from_=sentFrom,
         to=sentTo
     )
-    logging.info("Sent SMS (%s) from %s to %s with content %s", message.sid, sentFrom, sentTo, messageBody)
+    logging.info(f"Sent SMS ({message.sid}) from {sentFrom} to {sentTo} with content {messageBody}")
 
 
 def event_listener_test(transactions):
-    logging.info("Event listener received transactions %s", transactions)
+    logging.info(f"Event listener received transactions {transactions}")
 
     for transaction in transactions:
         date = datetime.datetime.fromtimestamp(transaction['timestamp'])
@@ -53,12 +48,11 @@ def transaction_checker(*listeners):
     last_fetch = datetime.datetime.now()
 
     while True:
-        time.sleep(argument_parser.get_transactions_check_interval())
-        mined_transactions_after = explorer_reader.request_mined_transactions_after(argument_parser.get_address(),
+        time.sleep(argument_parser.get_argument(Argument.TRANSACTIONS_CHECK_INTERVAL))
+        mined_transactions_after = explorer_reader.request_mined_transactions_after(argument_parser.get_argument(Argument.ADDRESS),
                                                                                     last_fetch)
         total_mined_transactions_after = len(mined_transactions_after)
-        logging.info("Checked for mined transactions after %s. Found: %s", last_fetch,
-                     total_mined_transactions_after)
+        logging.info(f"Checked for mined transactions after {last_fetch}. Found: {total_mined_transactions_after}")
         last_fetch = datetime.datetime.now()
 
         if total_mined_transactions_after > 0:
@@ -68,9 +62,9 @@ def transaction_checker(*listeners):
 
 if __name__ == '__main__':
     logging.info("Hydrachain Staking Notification")
-    logging.info("Started the application with log level %s", argument_parser.get_log_level())
-    logging.info("Listening for transactions on address %s", argument_parser.get_address())
-    logging.info("Transactions check interval is %s seconds", argument_parser.get_transactions_check_interval())
+    logging.info(f"Started the application with log level {argument_parser.get_argument(Argument.LOG_LEVEL)}")
+    logging.info(f"Listening for transactions on address {argument_parser.get_argument(Argument.ADDRESS)}")
+    logging.info(f"Transactions check interval is {argument_parser.get_argument(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
 
     # TODO: If SMS/Webhook is enable, log more configurations without secret ones.
 
