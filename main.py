@@ -7,14 +7,15 @@ from twilio.rest import Client
 
 from arguments import ArgumentParser, Argument
 
-argument_parser = ArgumentParser()
+VERSION = "1.0.0"
+
+argument_parser = ArgumentParser(VERSION)
 
 logging.basicConfig(level=argument_parser.get_argument(Argument.LOG_LEVEL),
                     format=argument_parser.get_argument(Argument.LOG_FORMAT))
 
 client = Client(argument_parser.get_argument(Argument.TWILIO_ACCOUNT_SID),
                 argument_parser.get_argument(Argument.TWILIO_AUTH_TOKEN))
-
 
 def send_sms(amount, datetime, address):
     datetime_formatted = datetime.strftime(argument_parser.get_argument(Argument.SMS_TRANSACTION_DATE_FORMAT))
