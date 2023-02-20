@@ -44,56 +44,56 @@ arguments = {
     },
     LOG_LEVEL_NAME: {
         'type': str,
-        'help': 'Level of logging. Default: {}'.format(LOG_LEVEL_DEFAULT),
+        'help': 'Level of logging',
         'choices': LOG_LEVEL_CHOICES,
         'default': LOG_LEVEL_DEFAULT
     },
     TWILIO_ACCOUNT_SID_NAME: {
         'type': str,
-        'help': 'Twilio account SID.'
+        'help': 'Twilio account SID'
     },
     TWILIO_AUTH_TOKEN_NAME: {
         'type': str,
-        'help': 'Twilio auth token.'
+        'help': 'Twilio auth token'
     },
     TWILIO_FROM_NUMBER_NAME: {
         'type': str,
-        'help': 'Twilio sms sending phone number.'
+        'help': 'Twilio sms sending phone number'
     },
     SMS_TO_NUMBER_NAME: {
         'type': str,
-        'help': 'Number to receive sms notifications.'
+        'help': 'Number to receive sms notifications'
     },
     TRANSACTIONS_CHECK_INTERVAL_NAME: {
         'type': int,
-        'help': 'How often to check for transactions. Default: {} seconds'.format(TRANSACTION_CHECK_INTERVAL_DEFAULT),
+        'help': 'How often to check for transactions in seconds',
         'default': TRANSACTION_CHECK_INTERVAL_DEFAULT
     },
     SMS_TRANSACTION_DATE_FORMAT_NAME: {
         'type': str,
-        'help': 'Datetime format for the transaction date sms. Refer to https://strftime.org/ for available formatting. Default: {}'.format(SMS_TRANSACTION_DATE_FORMAT_DEFAULT.replace('%', '%%')),
+        'help': 'Datetime format for the transaction date sms. Refer to https://strftime.org/ for available formatting',
         'default': SMS_TRANSACTION_DATE_FORMAT_DEFAULT
     },
     LOG_FORMAT_NAME: {
         'type': str,
-        'help': 'Format of the logs. Refer to https://docs.python.org/3/library/logging.html#logrecord-attributes for available formatting. Default: {}'.format(LOG_FORMAT_DEFAULT.replace('%', '%%')),
+        'help': 'Format of the logs. Refer to https://docs.python.org/3/library/logging.html#logrecord-attributes for available formatting',
         'default': LOG_FORMAT_DEFAULT
     },
     SMS_ENABLE_NAME: {
         'type': str,
-        'help': 'To enable sms sending. Default: {}'.format(SMS_ENABLE_DEFAULT),
+        'help': 'To enable sms sending',
         'choices': SMS_ENABLE_CHOICES,
         'default': SMS_ENABLE_DEFAULT
     },
     WEBHOOK_ENABLE_NAME: {
         'type': str,
-        'help': 'To enable webhook sending. Default: {}'.format(WEBHOOK_ENABLE_DEFAULT),
+        'help': 'To enable webhook sending',
         'choices': WEBHOOK_ENABLE_CHOICES,
         'default': WEBHOOK_ENABLE_DEFAULT
     },
     WEBHOOK_URL_NAME: {
         'type': str,
-        'help': 'URL for sending the webhook. Default: {}'.format(WEBHOOK_URL_DEFAULT),
+        'help': 'URL for sending the webhook',
         'default': WEBHOOK_URL_DEFAULT
     },
     WEBHOOK_SECRET_KEY_NAME: {
@@ -106,7 +106,7 @@ arguments = {
 class HydraChainArguments:
 
     def __init__(self):
-        parser = argparse.ArgumentParser(description='Hydrachain Staking Notification')
+        parser = argparse.ArgumentParser(description='Hydrachain Staking Notification', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
         for arg_name, arg_attrs in arguments.items():
             parser.add_argument('--{}'.format(arg_name), dest=arg_name, **arg_attrs)
