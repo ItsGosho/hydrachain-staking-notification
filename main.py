@@ -62,7 +62,7 @@ def transaction_checker(*listeners):
 
 
 if __name__ == '__main__':
-    logging.info("Hydrachain Staking Notification")
+    logging.info(f"Hydrachain Staking Notification {VERSION}")
     logging.info(f"Started the application with log level {argument_parser.get_argument(Argument.LOG_LEVEL)}")
     logging.info(f"Listening for transactions on address {argument_parser.get_argument(Argument.ADDRESS)}")
     logging.info(f"Transactions check interval is {argument_parser.get_argument(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
