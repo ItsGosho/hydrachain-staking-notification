@@ -5,17 +5,27 @@ import explorer_reader
 import datetime
 from twilio.rest import Client
 
-from arguments import HydraChainArguments
+from arguments import ArgumentParser, Argument
 
-hydrachain_arguments = HydraChainArguments()
-logging.basicConfig(level=hydrachain_arguments.get_log_level(), format=hydrachain_arguments.get_log_format())
-client = Client(hydrachain_arguments.get_twilio_account_sid(), hydrachain_arguments.get_twilio_auth_token())
+argument_parser = ArgumentParser()
+
+# TODO: Which one of these two is better and what are their cons and pros
+argument_parser.get_sms_enable()
+argument_parser.get_argument(Argument.ADDRESS)
+
+logging.basicConfig(level=argument_parser.get_log_level(), format=argument_parser.get_log_format())
+
+logging.basicConfig(level=argument_parser.get_argument(Argument.LOG_LEVEL),
+                    format=argument_parser.get_argument(Argument.LOG_FORMAT))
+
+client = Client(argument_parser.get_twilio_account_sid(), argument_parser.get_twilio_auth_token())
+
 
 def send_sms(amount, datetime, address):
-    datetime_formatted = datetime.strftime(hydrachain_arguments.get_sms_transaction_date_format())
+    datetime_formatted = datetime.strftime(argument_parser.get_sms_transaction_date_format())
     messageBody = "Hydra Mined:\n{}\n{} UTC\n{}".format(amount, datetime_formatted, address)
-    sentFrom = hydrachain_arguments.get_twilio_from_number()
-    sentTo = hydrachain_arguments.get_sms_to_number()
+    sentFrom = argument_parser.get_twilio_from_number()
+    sentTo = argument_parser.get_sms_to_number()
 
     message = client.messages.create(
         body=messageBody,
@@ -43,8 +53,8 @@ def transaction_checker(*listeners):
     last_fetch = datetime.datetime.now()
 
     while True:
-        time.sleep(hydrachain_arguments.get_transactions_check_interval())
-        mined_transactions_after = explorer_reader.request_mined_transactions_after(hydrachain_arguments.get_address(),
+        time.sleep(argument_parser.get_transactions_check_interval())
+        mined_transactions_after = explorer_reader.request_mined_transactions_after(argument_parser.get_address(),
                                                                                     last_fetch)
         total_mined_transactions_after = len(mined_transactions_after)
         logging.info("Checked for mined transactions after %s. Found: %s", last_fetch,
@@ -58,11 +68,11 @@ def transaction_checker(*listeners):
 
 if __name__ == '__main__':
     logging.info("Hydrachain Staking Notification")
-    logging.info("Started the application with log level %s", hydrachain_arguments.get_log_level())
-    logging.info("Listening for transactions on address %s", hydrachain_arguments.get_address())
-    logging.info("Transactions check interval is %s seconds", hydrachain_arguments.get_transactions_check_interval())
+    logging.info("Started the application with log level %s", argument_parser.get_log_level())
+    logging.info("Listening for transactions on address %s", argument_parser.get_address())
+    logging.info("Transactions check interval is %s seconds", argument_parser.get_transactions_check_interval())
 
-    #TODO: If SMS/Webhook is enable, log more configurations without secret ones.
+    # TODO: If SMS/Webhook is enable, log more configurations without secret ones.
 
     p1 = multiprocessing.Process(target=transaction_checker, args=(event_listener_test,))
     p1.start()

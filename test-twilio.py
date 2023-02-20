@@ -1,7 +1,7 @@
 from twilio.rest import Client
-from arguments import HydraChainArguments
+from arguments import ArgumentParser
 
-hydrachain_arguments = HydraChainArguments()
+hydrachain_arguments = ArgumentParser()
 
 client = Client(hydrachain_arguments.get_twilio_account_sid(), hydrachain_arguments.get_twilio_auth_token())
 
