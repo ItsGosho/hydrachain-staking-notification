@@ -1,14 +1,12 @@
-import json
-import datetime
 import logging
 
 import requests
 
 
-def request_address_transaction_ids(address, page=0, pageSize=20):
+def request_address_transaction_ids(address, page=0, page_size=20):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'}
-    url = f"https://explorer.hydrachain.org/7001/address/{address}/txs?page={page}&pageSize={pageSize}"
+    url = f"https://explorer.hydrachain.org/7001/address/{address}/txs?page={page}&pageSize={page_size}"
     response = requests.get(url=url, headers=headers)
     logging.debug(response.content)
     return response.json()
@@ -23,7 +21,7 @@ def request_transactions(transaction_ids):
     return response.json()
 
 
-def request_transactions_created_after(address, datetime):
+def request_transactions_created_after(address, created_after):
     transactions_created_after = []
 
     while True:
@@ -33,19 +31,20 @@ def request_transactions_created_after(address, datetime):
         logging.debug(transactions)
 
         for transaction in transactions:
-            if (transaction["timestamp"] >= datetime.timestamp()):
+            if (transaction["timestamp"] >= created_after.timestamp()):
                 transactions_created_after.append(transaction)
             else:
                 return transactions_created_after
 
-def request_mined_transactions_after(address, datetime):
-    transactions_created_after = request_transactions_created_after(address, datetime)
+
+def request_mined_transactions_after(address, after):
+    transactions_created_after = request_transactions_created_after(address, after)
     logging.debug(transactions_created_after)
 
-    filteredTransactions = list(filter(lambda transaction: transaction["isCoinstake"] == True, transactions_created_after))
+    filteredTransactions = list(
+        filter(lambda transaction: transaction["isCoinstake"] == True, transactions_created_after))
     logging.debug(filteredTransactions)
     return filteredTransactions
-
 
 # address = "XXX"
 # mined_transactions_until = request_mined_transactions_after(address, datetime.datetime.now() - datetime.timedelta(days =10))

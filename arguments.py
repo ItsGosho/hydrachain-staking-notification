@@ -106,12 +106,12 @@ class ArgumentParser:
         self._validate_sms_arguments_are_provided()
         self._validate_webhook_arguments_are_provided()
 
-    def get_argument(self, argument):
+    def get(self, argument):
         return self.arguments.__getattribute__(argument.value)
 
     def _validate_webhook_arguments_are_provided(self):
 
-        if self.get_argument(Argument.WEBHOOK_ENABLE) == 'no':
+        if self.get(Argument.WEBHOOK_ENABLE) == 'no':
             return
 
         required_arguments = [Argument.WEBHOOK_SECRET_KEY]
@@ -120,7 +120,7 @@ class ArgumentParser:
 
     def _validate_sms_arguments_are_provided(self):
 
-        if self.get_argument(Argument.SMS_ENABLE) == 'no':
+        if self.get(Argument.SMS_ENABLE) == 'no':
             return
 
         required_arguments = [Argument.TWILIO_ACCOUNT_SID, Argument.TWILIO_AUTH_TOKEN, Argument.TWILIO_FROM_NUMBER,
@@ -145,7 +145,7 @@ class ArgumentParser:
         arguments_with_none_value = []
 
         for argument in arguments:
-            argument_value = self.get_argument(argument)
+            argument_value = self.get(argument)
             arguments_with_none_value.append(argument) if argument_value == None else None
 
         return arguments_with_none_value

@@ -11,17 +11,17 @@ VERSION = "1.0.0"
 
 argument_parser = ArgumentParser(VERSION)
 
-logging.basicConfig(level=argument_parser.get_argument(Argument.LOG_LEVEL),
-                    format=argument_parser.get_argument(Argument.LOG_FORMAT))
+logging.basicConfig(level=argument_parser.get(Argument.LOG_LEVEL),
+                    format=argument_parser.get(Argument.LOG_FORMAT))
 
-client = Client(argument_parser.get_argument(Argument.TWILIO_ACCOUNT_SID),
-                argument_parser.get_argument(Argument.TWILIO_AUTH_TOKEN))
+client = Client(argument_parser.get(Argument.TWILIO_ACCOUNT_SID),
+                argument_parser.get(Argument.TWILIO_AUTH_TOKEN))
 
 def send_sms(amount, datetime, address):
-    datetime_formatted = datetime.strftime(argument_parser.get_argument(Argument.SMS_TRANSACTION_DATE_FORMAT))
+    datetime_formatted = datetime.strftime(argument_parser.get(Argument.SMS_TRANSACTION_DATE_FORMAT))
     messageBody = f"Hydra Mined:\n{amount}\n{datetime_formatted} UTC\n{address}"
-    sentFrom = argument_parser.get_argument(Argument.TWILIO_FROM_NUMBER)
-    sentTo = argument_parser.get_argument(Argument.SMS_TO_NUMBER)
+    sentFrom = argument_parser.get(Argument.TWILIO_FROM_NUMBER)
+    sentTo = argument_parser.get(Argument.SMS_TO_NUMBER)
 
     message = client.messages.create(
         body=messageBody,
@@ -43,14 +43,14 @@ def event_listener_test(transactions):
 
 def transaction_checker(*listeners):
     # Test:
-    # date_str = '10/02/2023'
-    # date = datetime.datetime.strptime(date_str, '%d/%m/%Y')
+    #date_str = '10/02/2023'
+    #last_fetch = datetime.datetime.strptime(date_str, '%d/%m/%Y')
 
     last_fetch = datetime.datetime.now()
 
     while True:
-        time.sleep(argument_parser.get_argument(Argument.TRANSACTIONS_CHECK_INTERVAL))
-        mined_transactions_after = explorer_reader.request_mined_transactions_after(argument_parser.get_argument(Argument.ADDRESS),
+        time.sleep(argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL))
+        mined_transactions_after = explorer_reader.request_mined_transactions_after(argument_parser.get(Argument.ADDRESS),
                                                                                     last_fetch)
         total_mined_transactions_after = len(mined_transactions_after)
         logging.info(f"Checked for mined transactions after {last_fetch}. Found: {total_mined_transactions_after}")
@@ -63,9 +63,9 @@ def transaction_checker(*listeners):
 
 if __name__ == '__main__':
     logging.info(f"Hydrachain Staking Notification {VERSION}")
-    logging.info(f"Started the application with log level {argument_parser.get_argument(Argument.LOG_LEVEL)}")
-    logging.info(f"Listening for transactions on address {argument_parser.get_argument(Argument.ADDRESS)}")
-    logging.info(f"Transactions check interval is {argument_parser.get_argument(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
+    logging.info(f"Started the application with log level {argument_parser.get(Argument.LOG_LEVEL)}")
+    logging.info(f"Listening for transactions on address {argument_parser.get(Argument.ADDRESS)}")
+    logging.info(f"Transactions check interval is {argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
 
     # TODO: If SMS/Webhook is enable, log more configurations without secret ones.
 
