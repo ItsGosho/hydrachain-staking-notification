@@ -67,8 +67,12 @@ if __name__ == '__main__':
     logging.info(f"Listening for transactions on address {argument_parser.get(Argument.ADDRESS)}")
     logging.info(f"Transactions check interval is {argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
 
-    # TODO: If SMS/Webhook is enable, log more configurations without secret ones.
+    if argument_parser.get(Argument.SMS_ENABLE) == 'yes':
+        logging.info("Option SMS is enabled.")
 
-    p1 = multiprocessing.Process(target=transaction_checker, args=(event_listener_test,))
-    p1.start()
-    p1.join()
+        p1 = multiprocessing.Process(target=transaction_checker, args=(event_listener_test,))
+        p1.start()
+        p1.join()
+
+    if argument_parser.get(Argument.WEBHOOK_ENABLE) == 'yes':
+        logging.info("Option Webhook is enabled.")
