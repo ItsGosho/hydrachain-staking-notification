@@ -59,6 +59,6 @@ class RewardChecker:
 
                         mined_transaction = MinedTransaction(date, amount, address)
 
-                        listener(mined_transaction)
+                        listener.onReward(mined_transaction)
 
         pass
