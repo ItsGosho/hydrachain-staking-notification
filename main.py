@@ -1,9 +1,14 @@
+import json
 import logging
 import datetime
+import hmac
+import hashlib
+
+import requests
 from twilio.rest import Client
 
 from arguments import ArgumentParser, Argument
-from transaction_checker import TransactionChecker
+from reward_checker import RewardChecker, MinedTransactionEncoder
 
 VERSION = "1.0.0"
 
@@ -16,32 +21,44 @@ client = Client(argument_parser.get(Argument.TWILIO_ACCOUNT_SID),
                 argument_parser.get(Argument.TWILIO_AUTH_TOKEN))
 
 
-def send_sms(amount, datetime, address):
-    datetime_formatted = datetime.strftime(argument_parser.get(Argument.SMS_TRANSACTION_DATE_FORMAT))
-    messageBody = f"Hydra Mined:\n{amount}\n{datetime_formatted} UTC\n{address}"
-    sentFrom = argument_parser.get(Argument.TWILIO_FROM_NUMBER)
-    sentTo = argument_parser.get(Argument.SMS_TO_NUMBER)
+def send_sms(body, from_, to):
 
     message = client.messages.create(
-        body=messageBody,
-        from_=sentFrom,
-        to=sentTo
+        body=body,
+        from_=from_,
+        to=to
     )
-    logging.info(f"Sent SMS ({message.sid}) from {sentFrom} to {sentTo} with content {messageBody}")
+    logging.info(f"Sent SMS ({message.sid}) from {from_} to {to} with content {body}")
+
+def send_webhook(secret_key, url, body):
+    timestamp = datetime.datetime.now().timestamp()
+
+    hashable = body + str(timestamp)
+    hashed = hmac.new(secret_key.encode(), hashable.encode(), hashlib.sha256).hexdigest()
+
+    signature_header = f"{hashed},{timestamp}"
+    headers = {'X-Webhook-Signature': signature_header}
+    response = requests.post(url, data=body, headers=headers)
+    logging.info(f"Sent Webhook to {url} with body {body} and signature {signature_header}")
 
 
 def transaction_listener_sms(transaction):
     logging.info(f"SMS Event Listener notified about transaction {transaction}")
 
-    date = datetime.datetime.fromtimestamp(transaction['timestamp'])
-    amount = abs(float(transaction['fees'])) / 100000000
-    address = transaction["inputs"][0]["address"]
-    send_sms(amount, date, address)
+    datetime_formatted = transaction['date'].strftime(argument_parser.get(Argument.SMS_TRANSACTION_DATE_FORMAT))
+    body = f"Hydra Mined:\n{transaction['amount']}\n{datetime_formatted} UTC\n{transaction['address']}"
+    from_ = argument_parser.get(Argument.TWILIO_FROM_NUMBER)
+    to = argument_parser.get(Argument.SMS_TO_NUMBER)
+
+    send_sms(body, from_, to)
 
 
 def transaction_listener_webhook(transaction):
     logging.info(f"Webhook Event Listener notified about transaction {transaction}")
 
+    send_webhook(argument_parser.get(Argument.WEBHOOK_SECRET_KEY),
+                 argument_parser.get(Argument.WEBHOOK_URL),
+                 json.dumps(transaction, cls=MinedTransactionEncoder))
 
 """
 The idea of behind that way of specifying the listeners and not just if X argument value is Y then
@@ -84,8 +101,8 @@ if __name__ == '__main__':
 
     listeners = get_listeners(transaction_listener_configurations, argument_parser.get_all())
 
-    transaction_checker = TransactionChecker(listeners,
-                                             argument_parser.get(Argument.ADDRESS),
-                                             argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL))
+    reward_checker = RewardChecker(listeners,
+                                   argument_parser.get(Argument.ADDRESS),
+                                   argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL))
 
-    transaction_checker.run()
+    reward_checker.run()
