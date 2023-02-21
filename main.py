@@ -1,11 +1,9 @@
 import logging
-import multiprocessing
-import time
-import explorer_reader
 import datetime
 from twilio.rest import Client
 
 from arguments import ArgumentParser, Argument
+from transaction_checker import TransactionChecker
 
 VERSION = "1.0.0"
 
@@ -16,6 +14,7 @@ logging.basicConfig(level=argument_parser.get(Argument.LOG_LEVEL),
 
 client = Client(argument_parser.get(Argument.TWILIO_ACCOUNT_SID),
                 argument_parser.get(Argument.TWILIO_AUTH_TOKEN))
+
 
 def send_sms(amount, datetime, address):
     datetime_formatted = datetime.strftime(argument_parser.get(Argument.SMS_TRANSACTION_DATE_FORMAT))
@@ -31,34 +30,48 @@ def send_sms(amount, datetime, address):
     logging.info(f"Sent SMS ({message.sid}) from {sentFrom} to {sentTo} with content {messageBody}")
 
 
-def event_listener_test(transactions):
-    logging.info(f"Event listener received transactions {transactions}")
+def transaction_listener_sms(transaction):
+    logging.info(f"SMS Event Listener notified about transaction {transaction}")
 
-    for transaction in transactions:
-        date = datetime.datetime.fromtimestamp(transaction['timestamp'])
-        amount = abs(float(transaction['fees'])) / 100000000
-        address = transaction["inputs"][0]["address"]
-        send_sms(amount, date, address)
+    date = datetime.datetime.fromtimestamp(transaction['timestamp'])
+    amount = abs(float(transaction['fees'])) / 100000000
+    address = transaction["inputs"][0]["address"]
+    send_sms(amount, date, address)
 
 
-def run_transaction_checker(*listeners):
-    # Test:
-    #date_str = '10/02/2023'
-    #last_fetch = datetime.datetime.strptime(date_str, '%d/%m/%Y')
+def transaction_listener_webhook(transaction):
+    logging.info(f"Webhook Event Listener notified about transaction {transaction}")
 
-    last_fetch = datetime.datetime.now()
 
-    while True:
-        time.sleep(argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL))
-        mined_transactions_after = explorer_reader.request_mined_transactions_after(argument_parser.get(Argument.ADDRESS),
-                                                                                    last_fetch)
-        total_mined_transactions_after = len(mined_transactions_after)
-        logging.info(f"Checked for mined transactions after {last_fetch}. Found: {total_mined_transactions_after}")
-        last_fetch = datetime.datetime.now()
+"""
+The idea of behind that way of specifying the listeners and not just if X argument value is Y then
+pass the listeners for calling to the transaction checker is to provider easier and more flexible way of doing it.
+That way without modifying the code and centralized more arguments listeners can be specified, which is way easier.
+"""
+transaction_listener_configurations = {
+    Argument.SMS_ENABLE.value: {
+        'expected_argument_values': ['yes'],
+        'listeners': [transaction_listener_sms]
+    },
+    Argument.WEBHOOK_ENABLE.value: {
+        'expected_argument_values': ['yes'],
+        'listeners': [transaction_listener_webhook]
+    }
+}
 
-        if total_mined_transactions_after > 0:
-            for listener in listeners:
-                listener(mined_transactions_after)
+
+def get_listeners(transaction_listener_configurations, argument_values):
+    listeners = []
+
+    for argument, configuration in transaction_listener_configurations.items():
+        expected_argument_values = configuration['expected_argument_values']
+
+        argument_provided_value = argument_values[argument]
+
+        if argument_provided_value in expected_argument_values:
+            listeners.extend(configuration['listeners'])
+
+    return listeners
 
 
 if __name__ == '__main__':
@@ -66,11 +79,13 @@ if __name__ == '__main__':
     logging.info(f"Started the application with log level {argument_parser.get(Argument.LOG_LEVEL)}")
     logging.info(f"Listening for transactions on address {argument_parser.get(Argument.ADDRESS)}")
     logging.info(f"Transactions check interval is {argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
+    logging.info(f"SMS enabled - {argument_parser.get(Argument.SMS_ENABLE)}")
+    logging.info(f"Webhook enabled {argument_parser.get(Argument.WEBHOOK_ENABLE)}")
 
-    run_transaction_checker([event_listener_test])
+    listeners = get_listeners(transaction_listener_configurations, argument_parser.get_all())
 
-    if argument_parser.get(Argument.SMS_ENABLE) == 'yes':
-        logging.info("Option SMS is enabled.")
+    transaction_checker = TransactionChecker(listeners,
+                                             argument_parser.get(Argument.ADDRESS),
+                                             argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL))
 
-    if argument_parser.get(Argument.WEBHOOK_ENABLE) == 'yes':
-        logging.info("Option Webhook is enabled.")
+    transaction_checker.run()

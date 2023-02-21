@@ -109,6 +109,9 @@ class ArgumentParser:
     def get(self, argument):
         return self.arguments.__getattribute__(argument.value)
 
+    def get_all(self):
+        return self.arguments.__dict__
+
     def _validate_webhook_arguments_are_provided(self):
 
         if self.get(Argument.WEBHOOK_ENABLE) == 'no':
