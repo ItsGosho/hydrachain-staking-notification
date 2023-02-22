@@ -3,11 +3,9 @@ import hmac
 import json
 import logging
 import datetime
-
 import requests
-from twilio.rest import Client
-
-from reward_checker import MinedTransactionEncoder
+import twilio.rest
+import reward_checker
 
 
 class TwilioSMSListener:
@@ -18,7 +16,7 @@ class TwilioSMSListener:
         self.from_ = from_
         self.to = to
         self.transaction_date_format = transaction_date_format
-        self.twilioClient = Client(self.account_sid, self.auth_token)
+        self.twilioClient = twilio.rest.Client(self.account_sid, self.auth_token)
 
     def onReward(self, transaction):
         logging.info(f"SMS Event Listener notified about transaction {transaction}")
@@ -51,7 +49,7 @@ class WebhookListener:
 
         self.send_webhook(self.secret_key,
                           self.url,
-                          json.dumps(transaction, cls=MinedTransactionEncoder))
+                          json.dumps(transaction, cls=reward_checker.MinedTransactionEncoder))
 
     def send_webhook(self, secret_key, url, body):
         timestamp = datetime.datetime.now().timestamp()

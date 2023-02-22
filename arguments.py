@@ -1,8 +1,8 @@
 import argparse
-from enum import Enum
+import enum
 
 
-class Argument(Enum):
+class Argument(enum.Enum):
     ADDRESS = 'address'
     LOG_LEVEL = 'log-level'
     TWILIO_ACCOUNT_SID = 'twilio-account-sid'
