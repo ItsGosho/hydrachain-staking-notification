@@ -1,8 +1,8 @@
 import logging
 
-from arguments import ArgumentParser, Argument
-from reward_checker import RewardChecker
-from reward_listeners import TwilioSMSListener, WebhookListener
+from argument.arguments import ArgumentParser, Argument
+from explorer.reward_publisher import RewardChecker
+from listener.reward_listeners import TwilioSMSListener, WebhookListener
 
 VERSION = "1.0.0"
 
@@ -10,6 +10,8 @@ argument_parser = ArgumentParser(VERSION)
 
 logging.basicConfig(level=argument_parser.get(Argument.LOG_LEVEL),
                     format=argument_parser.get(Argument.LOG_FORMAT))
+
+logger = logging.getLogger(__name__)
 
 
 def get_listeners(argument_values):
@@ -36,12 +38,12 @@ def get_listeners(argument_values):
 
 
 if __name__ == '__main__':
-    logging.info(f"Hydrachain Staking Notification {VERSION}")
-    logging.info(f"Started the application with log level {argument_parser.get(Argument.LOG_LEVEL)}")
-    logging.info(f"Listening for transactions on address {argument_parser.get(Argument.ADDRESS)}")
-    logging.info(f"Transactions check interval is {argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
-    logging.info(f"SMS enabled - {argument_parser.get(Argument.SMS_ENABLE)}")
-    logging.info(f"Webhook enabled {argument_parser.get(Argument.WEBHOOK_ENABLE)}")
+    logger.info(f"Hydrachain Staking Notification {VERSION}")
+    logger.info(f"Started the application with log level {argument_parser.get(Argument.LOG_LEVEL)}")
+    logger.info(f"Listening for transactions on address {argument_parser.get(Argument.ADDRESS)}")
+    logger.info(f"Transactions check interval is {argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
+    logger.info(f"SMS enabled - {argument_parser.get(Argument.SMS_ENABLE)}")
+    logger.info(f"Webhook enabled {argument_parser.get(Argument.WEBHOOK_ENABLE)}")
 
     listeners = get_listeners(argument_parser.get_all())
 

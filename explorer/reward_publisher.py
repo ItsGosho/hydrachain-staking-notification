@@ -2,8 +2,9 @@ import datetime
 import json
 import time
 import logging
-import explorer_reader
+from explorer import explorer_reader
 
+logger = logging.getLogger(__name__)
 
 class MinedTransaction:
 
@@ -40,13 +41,15 @@ class RewardChecker:
     def run(self):
 
         while True:
+            test = __name__
+            logger.info(test)
 
             time.sleep(self.check_interval_seconds)
 
             mined_transactions_after = explorer_reader.request_mined_transactions_after(self.address, self.last_fetch)
 
             total_mined_transactions_after = len(mined_transactions_after)
-            logging.info(
+            logger.info(
                 f"Checked for mined transactions after {self.last_fetch}. Found: {total_mined_transactions_after}")
             self.last_fetch = datetime.datetime.now()
 

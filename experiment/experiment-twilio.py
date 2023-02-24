@@ -1,5 +1,5 @@
 from twilio.rest import Client
-from arguments import ArgumentParser
+from argument.arguments import ArgumentParser
 
 hydrachain_arguments = ArgumentParser()
 

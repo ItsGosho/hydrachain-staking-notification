@@ -5,8 +5,8 @@ import logging
 import datetime
 import requests
 import twilio.rest
-import reward_checker
 
+logger = logging.getLogger(__name__)
 
 class TwilioSMSListener:
 
@@ -19,7 +19,7 @@ class TwilioSMSListener:
         self.twilioClient = twilio.rest.Client(self.account_sid, self.auth_token)
 
     def onReward(self, transaction):
-        logging.info(f"SMS Event Listener notified about transaction {transaction}")
+        logger.info(f"SMS Event Listener notified about transaction {transaction}")
 
         datetime_formatted = transaction.date.strftime(self.transaction_date_format)
         body = f"Hydra Mined:\n{transaction.amount}\n{datetime_formatted} UTC\n{transaction.address}"
@@ -32,7 +32,7 @@ class TwilioSMSListener:
             from_=self.from_,
             to=self.to
         )
-        logging.info(f"Sent SMS ({message.sid}) from {self.from_} to {self.to} with content {body}")
+        logger.info(f"Sent SMS ({message.sid}) from {self.from_} to {self.to} with content {body}")
 
     def __str__(self):
         return f"name: {self.account_sid}, auth_token: {self.auth_token}, from_: {self.from_}, to: {self.to}"
@@ -45,7 +45,7 @@ class WebhookListener:
         self.url = url
 
     def onReward(self, transaction):
-        logging.info(f"Webhook Event Listener notified about transaction {transaction}")
+        logger.info(f"Webhook Event Listener notified about transaction {transaction}")
 
         self.send_webhook(self.secret_key,
                           self.url,
@@ -60,7 +60,7 @@ class WebhookListener:
         signature_header = f"{hashed},{timestamp}"
         headers = {'X-Webhook-Signature': signature_header}
         response = requests.post(url, data=body, headers=headers)
-        logging.info(f"Sent Webhook to {url} with body {body} and signature {signature_header}")
+        logger.info(f"Sent Webhook to {url} with body {body} and signature {signature_header}")
 
     def __str__(self):
         return f"secret_key: {self.secret_key}, url: {self.url}"
