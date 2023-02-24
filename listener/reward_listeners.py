@@ -6,6 +6,8 @@ import datetime
 import requests
 import twilio.rest
 
+from explorer import reward_publisher
+
 logger = logging.getLogger(__name__)
 
 class TwilioSMSListener:
@@ -49,7 +51,7 @@ class WebhookListener:
 
         self.send_webhook(self.secret_key,
                           self.url,
-                          json.dumps(transaction, cls=reward_checker.MinedTransactionEncoder))
+                          json.dumps(transaction, cls=reward_publisher.MinedTransactionEncoder))
 
     def send_webhook(self, secret_key, url, body):
         timestamp = datetime.datetime.now().timestamp()

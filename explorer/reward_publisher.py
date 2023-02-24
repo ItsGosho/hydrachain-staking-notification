@@ -45,16 +45,16 @@ class RewardChecker:
 
             mined_transactions_after = self._checkForRewards(self.address, self.last_check)
 
+            if not len(mined_transactions_after) > 0:
+                continue
 
-            if len(mined_transactions_after) > 0:
-                for mined_transaction_after in mined_transactions_after:
-                    for listener in self.listeners:
+            for mined_transaction_after in mined_transactions_after:
+                mined_transaction = self._mapExplorerTransactionToMinedTransaction(mined_transaction_after)
+                self._callListeners(self.listeners, mined_transaction)
 
-                        mined_transaction = self._mapExplorerTransactionToMinedTransaction(mined_transaction_after)
-
-                        listener.onReward(mined_transaction)
-
-        pass
+    def _callListeners(self, listeners, mined_transaction):
+        for listener in listeners:
+            listener.onReward(mined_transaction)
 
     def _checkForRewards(self, address, last_check):
         mined_transactions_after = explorer_reader.request_mined_transactions_after(address, last_check)
@@ -71,5 +71,3 @@ class RewardChecker:
         address = explorer_transaction["inputs"][0]["address"]
 
         return MinedTransaction(date, amount, address)
-
-    def _
