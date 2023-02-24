@@ -36,32 +36,40 @@ class RewardChecker:
         # self.last_fetch = datetime.datetime.now()
 
         date_str = '20/02/2023'
-        self.last_fetch = datetime.datetime.strptime(date_str, '%d/%m/%Y')
+        self.last_check = datetime.datetime.strptime(date_str, '%d/%m/%Y')
 
     def run(self):
 
         while True:
-            test = __name__
-            logger.info(test)
-
             time.sleep(self.check_interval_seconds)
 
-            mined_transactions_after = explorer_reader.request_mined_transactions_after(self.address, self.last_fetch)
+            mined_transactions_after = self._checkForRewards(self.address, self.last_check)
 
-            total_mined_transactions_after = len(mined_transactions_after)
-            logger.info(
-                f"Checked for mined transactions after {self.last_fetch}. Found: {total_mined_transactions_after}")
-            self.last_fetch = datetime.datetime.now()
 
-            if total_mined_transactions_after > 0:
+            if len(mined_transactions_after) > 0:
                 for mined_transaction_after in mined_transactions_after:
                     for listener in self.listeners:
-                        date = datetime.datetime.fromtimestamp(mined_transaction_after['timestamp'])
-                        amount = abs(float(mined_transaction_after['fees'])) / 100000000
-                        address = mined_transaction_after["inputs"][0]["address"]
 
-                        mined_transaction = MinedTransaction(date, amount, address)
+                        mined_transaction = self._mapExplorerTransactionToMinedTransaction(mined_transaction_after)
 
                         listener.onReward(mined_transaction)
 
         pass
+
+    def _checkForRewards(self, address, last_check):
+        mined_transactions_after = explorer_reader.request_mined_transactions_after(address, last_check)
+
+        total_mined_transactions_after = len(mined_transactions_after)
+        logger.info(
+            f"Checked for rewards after {last_check}. Found: {total_mined_transactions_after}")
+        self.last_check = datetime.datetime.now()
+        return mined_transactions_after
+
+    def _mapExplorerTransactionToMinedTransaction(self, explorer_transaction):
+        date = datetime.datetime.fromtimestamp(explorer_transaction['timestamp'])
+        amount = abs(float(explorer_transaction['fees'])) / 100000000
+        address = explorer_transaction["inputs"][0]["address"]
+
+        return MinedTransaction(date, amount, address)
+
+    def _
