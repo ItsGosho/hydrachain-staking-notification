@@ -6,6 +6,7 @@ from explorer import explorer_reader
 
 logger = logging.getLogger(__name__)
 
+
 class MinedTransaction:
 
     def __init__(self, date, amount, address):
@@ -14,7 +15,8 @@ class MinedTransaction:
         self.address = address
 
     def __str__(self):
-        return f"{self.date}, {self.amount}, {self.address}"
+        return f"date: {self.date}, amount: {self.amount}, address: {self.address}"
+
 
 class MinedTransactionEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -33,14 +35,16 @@ class RewardChecker:
         self.listeners = listeners
         self.address = address
         self.check_interval_seconds = check_interval_seconds
+        self.running = False
         # self.last_fetch = datetime.datetime.now()
 
         date_str = '20/02/2023'
         self.last_check = datetime.datetime.strptime(date_str, '%d/%m/%Y')
 
-    def run(self):
+    def start(self):
+        self.running = True
 
-        while True:
+        while self.running:
             time.sleep(self.check_interval_seconds)
 
             mined_transactions_after = self._checkForRewards(self.address, self.last_check)
@@ -52,16 +56,21 @@ class RewardChecker:
                 mined_transaction = self._mapExplorerTransactionToMinedTransaction(mined_transaction_after)
                 self._callListeners(self.listeners, mined_transaction)
 
+    def stop(self):
+        self.running = False
+
     def _callListeners(self, listeners, mined_transaction):
         for listener in listeners:
             listener.onReward(mined_transaction)
 
     def _checkForRewards(self, address, last_check):
-        mined_transactions_after = explorer_reader.request_mined_transactions_after(address, last_check)
+        mined_transactions_after = explorer_reader.request_mined_transactions_created_after(address, last_check)
 
-        total_mined_transactions_after = len(mined_transactions_after)
+        logger.debug(
+            f"Checked for reward transaction of address {address} after {last_check}. Found: {mined_transactions_after}")
         logger.info(
-            f"Checked for rewards after {last_check}. Found: {total_mined_transactions_after}")
+            f"Checked for reward transaction of address {address} after {last_check}. Total: {len(mined_transactions_after)}")
+
         self.last_check = datetime.datetime.now()
         return mined_transactions_after
 

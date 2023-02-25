@@ -36,7 +36,6 @@ def get_listeners(argument_values):
 
     return listeners
 
-
 if __name__ == '__main__':
     logger.info(f"Hydrachain Staking Notification {VERSION}")
     logger.info(f"Started the application with log level {argument_parser.get(Argument.LOG_LEVEL)}")
@@ -51,4 +50,5 @@ if __name__ == '__main__':
                                    argument_parser.get(Argument.ADDRESS),
                                    argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL))
 
-    reward_checker.run()
+    reward_checker.start()
+
