@@ -14,9 +14,8 @@ pip install twilio
 systemctl enable /opt/services/hydrachain-staking-notification.service
 
 
-Files Content:
+File Content (/opt/services/StartScripts/HydrachainStakingNotificationStart.sh):
 
-/opt/services/StartScripts/HydrachainStakingNotificationStart.sh:
 #!/bin/bash
 
 projectFolder=/opt/sources/hydrachain-staking-notification
@@ -25,25 +24,30 @@ logFilePath=/opt/services/logs/$logFileName
 
 #Arguments
 
+logLevel="DEBUG"
 address="XXXXXX"
 twilioAccountSID="XXXXXX"
 twilioAuthToken="XXXXXX"
 twilioFromNumber="XXXXXX"
 smsToNumber="XXXXXX"
-transactionsCheckInterval=300 #5 Minutes
+smsEnable="yes"
+transactionsCheckInterval=60 #1 Minute
 
 nohup python3 "$projectFolder/main.py" \
+ --log-level $logLevel \
  --address $address \
  --twilio-account-sid $twilioAccountSID \
  --twilio-auth-token $twilioAuthToken \
  --twilio-from-number $twilioFromNumber \
  --sms-to-number $smsToNumber \
  --transactions-check-interval  $transactionsCheckInterval \
+ --sms-enable $smsEnable \
  &> "$logFilePath"
 
 echo "Executed Start Script - Hydrachain Staking Notification!
 
-/opt/services/hydrachain-staking-notification.service:
+File Content (/opt/services/StartScripts/hydrachain-staking-notification.service):
+
 [Unit]
 Description=Hydrachain Staking Notification
 [Service]
