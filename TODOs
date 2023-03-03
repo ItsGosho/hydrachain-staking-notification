@@ -1,0 +1,4 @@
+
+
+1. When constructing a object that uses one of the configuration argument, if a argument is not provided use the one set as OS Variable in the constructor:
+self.twilioAccountSID = twilioAccountSID or environment.get('TWILIO_ACCOUNT_SID')
