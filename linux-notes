@@ -1,6 +1,10 @@
-apt install python3
-apt install python3-pip
-pip install twilio
+add-apt-repository ppa:deadsnakes/ppa
+apt install python3.11
+apt install python3.11-*
+curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+python3.11 -m pip install hydrachain-explorer-requester
+python3.11 -m pip install twilio
+
 
 - Create /opt/sources/hydrachain-staking-notification
 - Clone Hydrachain-Staking-Notification from GitHub into /opt/sources/hydrachain-staking-notification
@@ -33,7 +37,7 @@ smsToNumber="XXXXXX"
 smsEnable="yes"
 transactionsCheckInterval=60 #1 Minute
 
-nohup python3 "$projectFolder/main.py" \
+nohup python3.11 "$projectFolder/main.py" \
  --log-level $logLevel \
  --address $address \
  --twilio-account-sid $twilioAccountSID \
