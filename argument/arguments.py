@@ -14,9 +14,14 @@ class Argument(enum.Enum):
     LOG_FORMAT = 'log-format'
     SMS_ENABLE = 'sms-enable'
     WEBHOOK_ENABLE = 'webhook-enable'
+    VIBER_BOT_ENABLE = 'viber-bot-enable'
     WEBHOOK_URL = 'webhook-url'
     WEBHOOK_SECRET_KEY = 'webhook-secret-key'
     WEBHOOK_TRANSACTION_DATE_FORMAT = 'webhook-transaction-date-format'
+    VIBER_BOT_NAME = 'viber-bot-name'
+    VIBER_BOT_AVATAR = 'viber-bot-avatar'
+    VIBER_BOT_TOKEN = 'viber-bot-token'
+    VIBER_USER = 'viber-user'
     VERSION = 'v'
 
 
@@ -75,6 +80,12 @@ arguments = {
         'choices': ['yes', 'no'],
         'default': 'no'
     },
+    Argument.VIBER_BOT_ENABLE.value: {
+        'type': str,
+        'help': 'To enable viber-bot sending',
+        'choices': ['yes', 'no'],
+        'default': 'no'
+    },
     Argument.WEBHOOK_URL.value: {
         'type': str,
         'help': 'URL for sending the webhook',
@@ -92,7 +103,25 @@ arguments = {
     Argument.VERSION.value: {
         'action': 'version',
         'version': '1.0'
-    }
+    },
+    Argument.VIBER_BOT_NAME.value: {
+        'type': str,
+        'help': 'Optional name of the bot. The name is visualized, when you open the bot chat',
+        'default': 'Staking Notification'
+    },
+    Argument.VIBER_BOT_AVATAR.value: {
+        'type': str,
+        'help': 'Optional picture of the bot. The picture is visualized, when you open the bot chat',
+        'default': 'https://hydradex.org/static/media/hydra-logo.92fbca59.png'
+    },
+    Argument.VIBER_BOT_TOKEN.value: {
+        'type': str,
+        'help': 'The unique token given after bot creation at the Viber website'
+    },
+    Argument.VIBER_USER.value: {
+        'type': str,
+        'help': 'The unique viber user id, which will receive the staking notification messages'
+    },
 }
 
 
@@ -109,8 +138,25 @@ class ArgumentParser:
 
         self.parser = parser
         self.arguments = self.parser.parse_args()
-        self._validate_sms_arguments_are_provided()
-        self._validate_webhook_arguments_are_provided()
+
+        self._validate_enable_argument_parameters_provided(Argument.SMS_ENABLE,
+                                                           [
+                                                               Argument.TWILIO_ACCOUNT_SID,
+                                                               Argument.TWILIO_AUTH_TOKEN,
+                                                               Argument.TWILIO_FROM_NUMBER,
+                                                               Argument.SMS_TO_NUMBER
+                                                           ])
+
+        self._validate_enable_argument_parameters_provided(Argument.WEBHOOK_ENABLE,
+                                                           [
+                                                               Argument.WEBHOOK_SECRET_KEY
+                                                           ])
+
+        self._validate_enable_argument_parameters_provided(Argument.VIBER_BOT_ENABLE,
+                                                           [
+                                                               Argument.VIBER_BOT_TOKEN,
+                                                               Argument.VIBER_USER
+                                                           ])
 
     def get(self, argument):
         return self.arguments.__getattribute__(argument.value)
@@ -118,23 +164,14 @@ class ArgumentParser:
     def get_all(self):
         return self.arguments.__dict__
 
-    def _validate_webhook_arguments_are_provided(self):
+    def _validate_enable_argument_parameters_provided(self, enable_argument, required_arguments):
 
-        if self.get(Argument.WEBHOOK_ENABLE) == 'no':
+        if self.get(enable_argument) == 'no':
             return
 
-        required_arguments = [Argument.WEBHOOK_SECRET_KEY]
+        self._validate_arguments_present(enable_argument, required_arguments)
 
-        self._validate_arguments_present(Argument.WEBHOOK_ENABLE, required_arguments)
-
-    def _validate_sms_arguments_are_provided(self):
-
-        if self.get(Argument.SMS_ENABLE) == 'no':
-            return
-
-        required_arguments = [Argument.TWILIO_ACCOUNT_SID, Argument.TWILIO_AUTH_TOKEN, Argument.TWILIO_FROM_NUMBER,
-                              Argument.SMS_TO_NUMBER]
-        self._validate_arguments_present(Argument.SMS_ENABLE, required_arguments)
+        pass
 
     def _validate_arguments_present(self, argument, required_arguments):
         missing_required_arguments = self.get_arguments_with_none_value(required_arguments)
