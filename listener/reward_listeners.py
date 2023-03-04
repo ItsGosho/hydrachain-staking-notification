@@ -5,10 +5,13 @@ import logging
 import datetime
 import requests
 import twilio.rest
+from viberbot import BotConfiguration, Api
+from viberbot.api.messages import TextMessage
 
 from explorer import reward_publisher
 
 logger = logging.getLogger(__name__)
+
 
 class TwilioSMSListener:
 
@@ -66,3 +69,39 @@ class WebhookListener:
 
     def __str__(self):
         return f"secret_key: {self.secret_key}, url: {self.url}"
+
+
+class ViberBotListener:
+
+    def __init__(self, bot_name, bot_avatar_url, bot_auth_token, receiving_user_id, transaction_date_format):
+        self.bot_name = bot_name
+        self.bot_avatar_url = bot_avatar_url
+        self.bot_auth_token = bot_auth_token
+        self.receiving_user_id = receiving_user_id
+        self.transaction_date_format = transaction_date_format
+
+        self.bot_configuration = BotConfiguration(
+            name=self.bot_name,
+            avatar=self.bot_avatar_url,
+            auth_token=self.bot_auth_token,
+        )
+        self.viber_api  = Api(self.bot_configuration)
+
+    def onReward(self, transaction):
+        logger.info(f"Viber Bot Event Listener notified about transaction {transaction}")
+
+        datetime_formatted = transaction.date.strftime(self.transaction_date_format)
+        message = f"Hydra Mined:\n{transaction.amount}\n{datetime_formatted} UTC\n{transaction.address}"
+
+        self.send_message(message)
+
+    def send_message(self, message):
+        self.viber_api.send_messages(self.receiving_user_id, [
+            TextMessage(
+                text=message
+            )
+        ])
+        logger.info(f"Sent Viber Message to user {self.receiving_user_id} with content {message}")
+
+    def __str__(self):
+        return f"bot_name: {self.bot_name}, bot_avatar_url: {self.bot_avatar_url}, bot_auth_token: {self.bot_auth_token}, receiving_user_id: {self.receiving_user_id}"

@@ -2,9 +2,9 @@ import logging
 
 from argument.arguments import ArgumentParser, Argument
 from explorer.reward_publisher import RewardChecker
-from listener.reward_listeners import TwilioSMSListener, WebhookListener
+from listener.reward_listeners import TwilioSMSListener, WebhookListener, ViberBotListener
 
-VERSION = "2.1.0"
+VERSION = "2.2.0"
 
 argument_parser = ArgumentParser(VERSION)
 
@@ -34,6 +34,16 @@ def get_listeners(argument_values):
                 url=argument_values[Argument.WEBHOOK_URL.value]
             ))
 
+    if argument_values[Argument.VIBER_BOT_ENABLE.value] == 'yes':
+        listeners.append(
+            ViberBotListener(
+                bot_name=argument_values[Argument.VIBER_BOT_NAME.value],
+                bot_avatar_url=argument_values[Argument.VIBER_BOT_AVATAR.value],
+                bot_auth_token=argument_values[Argument.VIBER_BOT_TOKEN.value],
+                receiving_user_id=argument_values[Argument.VIBER_USER.value],
+                transaction_date_format=argument_values[Argument.VIBER_BOT_TRANSACTION_DATE_FORMAT.value]
+            ))
+
     return listeners
 
 if __name__ == '__main__':
@@ -43,6 +53,7 @@ if __name__ == '__main__':
     logger.info(f"Transactions check interval is {argument_parser.get(Argument.TRANSACTIONS_CHECK_INTERVAL)} seconds")
     logger.info(f"SMS enabled - {argument_parser.get(Argument.SMS_ENABLE)}")
     logger.info(f"Webhook enabled {argument_parser.get(Argument.WEBHOOK_ENABLE)}")
+    logger.info(f"Viber Bot enabled {argument_parser.get(Argument.VIBER_BOT_ENABLE)}")
 
     listeners = get_listeners(argument_parser.get_all())
 

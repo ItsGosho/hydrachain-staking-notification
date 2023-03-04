@@ -22,6 +22,7 @@ class Argument(enum.Enum):
     VIBER_BOT_AVATAR = 'viber-bot-avatar'
     VIBER_BOT_TOKEN = 'viber-bot-token'
     VIBER_USER = 'viber-user'
+    VIBER_BOT_TRANSACTION_DATE_FORMAT = 'viber-bot-transaction-date-format'
     VERSION = 'v'
 
 
@@ -121,6 +122,11 @@ arguments = {
     Argument.VIBER_USER.value: {
         'type': str,
         'help': 'The unique viber user id, which will receive the staking notification messages'
+    },
+    Argument.VIBER_BOT_TRANSACTION_DATE_FORMAT.value: {
+        'type': str,
+        'help': 'Datetime format for the transaction date. Refer to https://strftime.org/ for available formatting',
+        'default': '%d-%b-%Y %H:%M:%S'
     },
 }
 
