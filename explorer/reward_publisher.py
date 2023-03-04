@@ -36,10 +36,10 @@ class RewardChecker:
         self.address = address
         self.check_interval_seconds = check_interval_seconds
         self.running = False
-        #self.last_check = datetime.datetime.now()
+        self.last_check = datetime.datetime.now()
 
-        date_str = '01/03/2023'
-        self.last_check = datetime.datetime.strptime(date_str, '%d/%m/%Y')
+        #date_str = '01/03/2023'
+        #self.last_check = datetime.datetime.strptime(date_str, '%d/%m/%Y')
 
     def start(self):
         self.running = True
