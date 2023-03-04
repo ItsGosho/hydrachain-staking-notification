@@ -1,0 +1,51 @@
+Using Viber to receive notification messages has less problems that the SMS systems for me.
+The setup is a bit complicated due to the idea of using Viber + API  to deliver a SMS to a number.
+
+I. Creating a Viber Bot:
+1. Go to https://partners.viber.com/login and login with your current Viber account.
+2. Create a Bot Account filling the necessary information
+3. Save the given unique to the bot token
+
+II. Set a webhook for the bot: (https://developers.viber.com/docs/api/rest-bot-api/#setting-a-webhook)
+
+- IMPORTANT: The hydrachain notification system uses the Viber bot only to send messages.
+Viber bot uses webhooks to deliver messages sent to the bot from users, when a new users has subscribed/unsubscribed.
+For that reason it requires to setup a webhook (url, which will receive these events)
+Because we want just sending to us and easy setup you will place the facebook domain for webhook url.
+The information sent from the Hydrachain Staking Notification to the user is 100% secure.
+The information sent from the User to the URL is not 100% secure, because the domain isn't ours.
+For that reason do not sent anything from the Viber App to the Bot.
+
+In Postman create a POST request to https://chatapi.viber.com/pa/set_webhook with raw JSON body:
+{
+   "auth_token": "REPLACE_WITH_YOUR_BOT_TOKEN",
+   "url":"https://facebook.com",
+   "event_types":[
+      "subscribed",
+      "unsubscribed",
+      "message"
+   ],
+   "send_name": false,
+   "send_photo": false
+}
+- We only need the subscribed event type, but by default it will subscribe to the three above even if we didn't provide them.
+- You can always update the url, even_types, name & photo at later stage with that requests
+
+III. Acquired your account id:
+Open Postman.
+Make GET request to https://chatapi.viber.com/pa/get_account_info with raw JSON body:
+{
+   "auth_token": "REPLACE_WITH_YOUR_BOT_TOKEN"
+}
+In the response there is a members field containing your account id.
+    "members": [
+        {
+            "id": "xxxx/xxxxxxx+xxx==",
+            "name": "xxx xxx",
+            "role": "admin"
+        }
+    ]
+Save your id (xxxx/xxxxxxx+xxx==)
+
+IV. Your are all set.
+Now you can provide your viber-botid and viber-userid
