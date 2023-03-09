@@ -4,7 +4,7 @@ from argument.arguments import ArgumentParser, Argument
 from explorer.reward_publisher import RewardChecker
 from listener.reward_listeners import TwilioSMSListener, WebhookListener, ViberBotListener
 
-VERSION = "2.2.0"
+VERSION = "2.2.1"
 
 argument_parser = ArgumentParser(VERSION)
 
