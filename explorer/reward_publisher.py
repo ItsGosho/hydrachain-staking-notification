@@ -3,6 +3,7 @@ import json
 import time
 import logging
 from explorer import explorer_reader
+from explorer.explorer_reader import ExplorerReader
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class MinedTransactionEncoder(json.JSONEncoder):
 
 class RewardChecker:
 
-    def __init__(self, listeners, address, check_interval_seconds):
+    def __init__(self, listeners, address, check_interval_seconds, explorer_reader: ExplorerReader = ExplorerReader()):
         self.listeners = listeners
         self.address = address
         self.check_interval_seconds = check_interval_seconds
@@ -40,6 +41,8 @@ class RewardChecker:
 
         #date_str = '01/03/2023'
         #self.last_check = datetime.datetime.strptime(date_str, '%d/%m/%Y')
+
+        self.explorer_reader = explorer_reader
 
     def start(self):
         self.running = True
@@ -64,7 +67,7 @@ class RewardChecker:
             listener.onReward(mined_transaction)
 
     def _checkForRewards(self, address, last_check):
-        mined_transactions_after = explorer_reader.request_mined_transactions_created_after(address, last_check)
+        mined_transactions_after = self.explorer_reader.request_mined_transactions_created_after(address, last_check)
 
         logger.debug(
             f"Checked for reward transaction of address {address} after {last_check}. Found: {mined_transactions_after}")
